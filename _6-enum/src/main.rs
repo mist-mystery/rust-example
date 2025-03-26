@@ -222,6 +222,8 @@ fn describe_state_quarter(coin: &Coin) -> Option<String> {
     }
 }
 
+// TODO: while let のマッチングについても記載
+
 // 早期 return を利用
 fn describe_state_quarter_happy(coin: &Coin) -> Option<String> {
     // state をローカル変数として取得
