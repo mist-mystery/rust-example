@@ -1,4 +1,4 @@
-pub fn main() {
+fn main() {
     let hello_world = "hello world";
     {
         // 単語の終端の添え字を返す場合

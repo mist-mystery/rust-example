@@ -4,7 +4,7 @@ enum IpAddrKind {
     V6,
 }
 
-pub fn main() {
+fn main() {
     {
         // IpAddrKind の各列挙子のインスタンスを生成
         let four = IpAddrKind::V4;

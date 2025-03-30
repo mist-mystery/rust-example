@@ -24,7 +24,7 @@ enum Coin {
     Quarter(UsState),
 }
 
-pub fn main() {
+fn main() {
     {
         // match 式を使う場合
         let config_max = Some(3u8);

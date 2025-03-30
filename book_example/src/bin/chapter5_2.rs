@@ -1,4 +1,4 @@
-pub fn main() {
+fn main() {
     variables();
     tuple();
     rectangle();

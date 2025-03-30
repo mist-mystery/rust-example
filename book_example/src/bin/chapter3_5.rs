@@ -1,4 +1,4 @@
-pub fn main() {
+fn main() {
     if_expression();
     println!("The result is {}", return_from_loops());
     loop_label();

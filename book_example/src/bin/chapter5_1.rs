@@ -7,7 +7,7 @@ struct User {
     active: bool,
 }
 
-pub fn main() {
+fn main() {
     // インスタンス化。構造体で宣言した通りの順番に指定する必要はない。
     let user1 = User {
         email: String::from("someone@example.com"),

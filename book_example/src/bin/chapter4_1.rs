@@ -1,4 +1,4 @@
-pub fn main() {
+fn main() {
     let hello = "hello";
     {
         // String型はヒープにメモリを確保するため、mutable にできる

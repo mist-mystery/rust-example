@@ -1,4 +1,4 @@
-pub fn main() {
+fn main() {
     {
         // （複数の）不変な参照
         let s1 = String::from("hello");

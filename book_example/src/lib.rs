@@ -1,14 +1,16 @@
-pub mod chapter1_1;
-pub mod chapter2;
-pub mod chapter3_2;
-pub mod chapter3_3;
-pub mod chapter3_5;
-pub mod chapter4_1;
-pub mod chapter4_2;
-pub mod chapter4_3;
-pub mod chapter5_1;
-pub mod chapter5_2;
-pub mod chapter5_3;
-pub mod chapter6_1;
-pub mod chapter6_2;
-pub mod chapter6_3;
+// src/chapter7_2 ディレクトリ内のモジュールを読み込むには、ここでネストする必要がある。
+// 仕組みについて詳しくは chapter7_5
+pub mod chapter7_2 {
+    pub mod garden;
+}
+
+pub mod chapter7_3 {
+    pub mod restaurant;
+}
+
+pub mod chapter7_4 {
+    pub mod restaurant;
+}
+
+// src/chapter7_5.rs を読み込む。
+pub mod chapter7_5;

@@ -12,7 +12,7 @@ enum Coin {
     Quarter(UsState),
 }
 
-pub fn main() {
+fn main() {
     {
         value_in_cents(Coin::Quarter(UsState::Alaska));
         let _c = Coin::Penny;

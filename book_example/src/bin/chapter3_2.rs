@@ -64,7 +64,7 @@ fn data_type() {
     );
 }
 
-pub fn main() {
+fn main() {
     variable();
     data_type();
 }
