@@ -1,6 +1,6 @@
 fn main() {
     {
-        // 空のベクタを作成。どんなデータを保持させるかの型注釈が必須。
+        // 空のベクタを作成。何も挿入しないなら、どんなデータを保持させるかの型注釈が必須。
         let _v: Vec<i32> = Vec::new();
     }
     {
@@ -14,6 +14,7 @@ fn main() {
         let v = vec![1, 2, 3, 4, 5];
 
         // 添え字記法（indexing syntax）で値を取得。型は &i32
+        // 添え字記法が使えるのは、Vec が Index trait (`fn index(&self, index: I)`)を実装しているため。
         let third_indexing = &v[2];
         println!("The third element is {third_indexing}");
 
@@ -25,7 +26,7 @@ fn main() {
         }
 
         // let does_not_exist = &v[100]; // [] で存在しない要素にアクセスしようとするとパニック
-        let does_not_exist = v.get(100); // こちらは None を返す
+        let does_not_exist = v.get(100); // get メソッドの場合は None を返す
         assert_eq!(does_not_exist, None);
     }
     {
@@ -59,6 +60,7 @@ enum SpreadsheetCell {
 
 fn spreadsheet() {
     // enum で（実質的に）異なる型の要素を保持するベクタを作成。
+    // vector が取り得る全ての値をコンパイル時に網羅できない場合はトレイトオブジェクトを使えるらしい(chapter17)
     let mut row = vec![
         SpreadsheetCell::Int(3),
         SpreadsheetCell::Text(String::from("blue")),
@@ -87,6 +89,7 @@ fn spreadsheet() {
     println!("{row:?}");
 }
 
+// リファレンスでの Vec の例
 fn struct_vec_example() {
     {
         // 初期化は Vec::from でも行うことができる。
