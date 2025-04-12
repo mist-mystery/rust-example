@@ -95,7 +95,7 @@ fn main() {
         assert_eq!(count, 2);
     }
     {
-        let coin = Coin::Quarter(if rand::thread_rng().gen_range(0..=1) > 0 {
+        let coin = Coin::Quarter(if rand::rng().random_range(0..=1) > 0 {
             UsState::Alaska
         } else {
             UsState::Alabama

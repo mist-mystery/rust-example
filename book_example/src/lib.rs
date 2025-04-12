@@ -15,3 +15,6 @@ pub mod chapter7_4 {
 
 // src/chapter7_5.rs を読み込む。
 pub mod chapter7_5;
+
+pub mod chapter11_1;
+pub mod chapter11_3;
