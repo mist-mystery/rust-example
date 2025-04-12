@@ -88,6 +88,7 @@ mod point2 {
             let _wont_work = Point { x: 5, y: 4.0 };
         }
         {
+            // mixup を使用
             let p1 = Point { x: 5, y: 10.4 };
             let p2 = Point { x: "Hello", y: 'c' };
 
