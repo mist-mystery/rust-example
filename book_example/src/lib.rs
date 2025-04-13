@@ -18,3 +18,6 @@ pub mod chapter7_5;
 
 pub mod chapter11_1;
 pub mod chapter11_3;
+pub mod chapter12_3;
+pub mod chapter12_4;
+pub mod chapter12_5;

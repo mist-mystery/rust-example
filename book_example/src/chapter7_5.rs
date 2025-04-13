@@ -2,7 +2,7 @@
 // 今のパスが crate::chapter7_5 であるから、`mod front_of_house` は src/chapter7_5/front_of_house.rs から読み込むことになる。
 // 読み込むことができるのは子孫のパスに限られる。兄弟でもダメ（クレートルートの場合は crate がパスなので、例外的にディレクトリ構造的に兄弟の位置にあるファイルを読み込める）。
 //   ⇒ 他の言語の "include" とは異なり、mod 単体では任意のパスのモジュールを読み込むことはできない。
-//   ※ mod.rs という特別なファイル名を使う方法もあるが、古い方法のようなので考えない。
+//   ※ mod.rs という特別なファイル名を使う方法もある。chapter11 の tests/common で実例を示す。
 mod front_of_house;
 
 // src/chapter7_5/back_of_house/kitchen.rs を読み込むのに、

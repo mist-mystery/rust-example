@@ -1,5 +1,6 @@
-// tests ディレクトリのテストはそれぞれ個別のクレートとなるため、各々ライブラリをインポートする必要がある。
-extern crate book_example;
+//! Rust 2018 Edition から、extern crate はほぼ必要なくなった。
+//! @see https://doc.rust-jp.rs/edition-guide/rust-2018/path-changes.html
+// extern crate book_example;
 
 use book_example::chapter11_3;
 
