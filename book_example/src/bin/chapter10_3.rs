@@ -118,8 +118,90 @@ mod gen_trait_lifetime {
     }
 }
 
+mod lifetime_difference {
+    struct Reader<'a> {
+        book: &'a str,
+    }
+
+    impl<'a> Reader<'a> {
+        fn read1_book(&mut self, _content: &String) -> &str {
+            self.book
+        }
+
+        fn read2_book(&'a mut self, _content: &String) -> &'a str {
+            self.book
+        }
+
+        // content と戻り値 &str のライフタイムは同じになる。
+        fn read3_content<'b>(&self, content: &'b String) -> &'b str {
+            content
+        }
+
+        // &self と戻り値 &str のライフタイムは同じになる。
+        fn read4_content<'b>(&'b self, content: &'b String) -> &'b str {
+            content
+        }
+    }
+
+    fn exec_read1() {
+        let mut reader = Reader { book: "the book" };
+        {
+            let _r = reader.read1_book(&String::from("value"));
+        }
+        let _r2 = reader.read1_book(&String::from("123"));
+    }
+
+    // exec_read1 と比べて、関数の中身は read2_content メソッドを使っているの以外同じだが、
+    // read2_content のライフタイムの指定により、戻り値はスコープ内までしか生存できないにも関わらず、
+    // reader インスタンスが生きている間は有効という扱いになる。
+    // そのため可変借用が生きているとみなされた状態で2回目の可変借用を行おうとしてコンパイルエラーになる。
+    fn exec_read2() {
+        let mut reader = Reader { book: "the book" };
+        {
+            let _r = reader.read2_book(&String::from("value"));
+        }
+        // let _r2 = reader.read2_book(&String::from("123")); // 借用エラー
+    }
+
+    #[allow(unused_mut)]
+    // read2 メソッドの戻り値 r は、引数で渡した値(value)の生存期間より長く生きれない。
+    fn exec_read3() {
+        let mut r;
+        let value = String::from("value");
+        {
+            let reader = Reader { book: "the book" };
+            r = reader.read3_content(&value);
+        }
+        assert_eq!(r, "value");
+    }
+
+    #[allow(unused_mut)]
+    #[allow(unused_variables)]
+    // exec_read3 と比べて、関数の中身は read4_content メソッドを使っているのと r を初期化してるかどうか以外同じだが、
+    // read4_content メソッドのライフタイムの指定によって、戻り値 r が reader の生存期間（ブロック内）より長く生きれない。
+    // しかし、ブロック外で r を使おうとしているため、コンパイルエラーになる。
+    fn exec_read4() {
+        let mut r = "value";
+        let value = String::from("value");
+        {
+            let reader = Reader { book: "the book" };
+            // r = reader.read4_content(&value); // ここでライフタイムのエラーとなる。
+        }
+        assert_eq!(r, "value");
+    }
+
+    pub fn main() {
+        exec_read1();
+        exec_read2();
+        exec_read3();
+        exec_read4();
+    }
+}
+
 fn main() {
     lifetime::main();
     lifetime_struct::main();
     gen_trait_lifetime::main();
+
+    lifetime_difference::main();
 }
