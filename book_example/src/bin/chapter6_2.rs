@@ -64,10 +64,13 @@ fn value_in_cents(coin: Coin) -> u32 {
 
 fn plus_one(x: Option<i32>) -> Option<i32> {
     // match は全可能性を網羅する必要がある
-    match x {
-        None => None, // 仮にこの行をコメントアウトすると non-exhaustive patterns のコンパイルエラー
-        Some(i) => Some(i + 1),
-    }
+    // match x {
+    //     None => None, // 仮にこの行をコメントアウトすると non-exhaustive patterns のコンパイルエラー
+    //     Some(i) => Some(i + 1),
+    // }
+
+    // このケースであればこちらの方が簡単
+    x.map(|i| i + 1)
 }
 
 // ? Operator を使って同じことを簡潔にできる（chapter9_2）

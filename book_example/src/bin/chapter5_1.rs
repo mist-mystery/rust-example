@@ -37,7 +37,7 @@ fn main() {
         // assert_eq!(user1.username, "someusername123"); // user1.username はムーブされるため使えなくなる
         assert_eq!(user1.email, "someone@example.com"); // user1.email はムーブされないため引き続き使える
         assert_eq!(user1.sign_in_count, 1); // 変数への `=` と同様、Copy トレイトを実装している型なら問題ない
-        assert_eq!(user1.active, true);
+        assert!(user1.active);
 
         assert_eq!(user2.username, "someusername123");
     }

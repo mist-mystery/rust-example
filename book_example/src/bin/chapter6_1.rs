@@ -74,7 +74,11 @@ fn main() {
                     Self::ChangeColor(r, g, b) => println!("rgb({r}, {g}, {b})"),
                 }
             }
-            fn new() {}
+
+            // 関連関数の例
+            fn new() -> Self {
+                Message::Quit
+            }
         }
 
         let _m = Message::Quit;
@@ -100,6 +104,7 @@ fn main() {
         let WriteMessage(_wm) = WriteMessage(String::from("hello"));
         let ChangeColorMessage(_cm0, _cm1, _cm2) = ChangeColorMessage(0, 0, 0);
     }
+    #[allow(clippy::unnecessary_literal_unwrap)] // unwrap() 説明用にわざと Some(5) を作成
     {
         // Option enum
         let some_number = Some(5);

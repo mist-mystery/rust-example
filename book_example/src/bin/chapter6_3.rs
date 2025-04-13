@@ -28,6 +28,7 @@ fn main() {
     {
         // match 式を使う場合
         let config_max = Some(3u8);
+        #[allow(clippy::single_match)] // 説明用のため if let でなくこちらを記述
         match config_max {
             Some(max) => println!("The maximum is configured to be {max}"),
             _ => (),
@@ -45,6 +46,7 @@ fn main() {
 
         // loop と match で条件を満たさなくなるまで処理を継続
         let mut optional = Some(0);
+        #[allow(clippy::while_let_loop)] // 説明用のため while let でなくこちらを記述
         loop {
             match optional {
                 Some(i) => {

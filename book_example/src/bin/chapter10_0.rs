@@ -14,7 +14,7 @@ fn main() {
 // スライスから最大値を探すコードを関数に抽出
 fn largest(list: &[i32]) -> Option<&i32> {
     // 0番目の要素がなければ、?演算子により即座に None を返す。
-    let mut largest = list.get(0)?;
+    let mut largest = list.first()?;
 
     for item in list.iter() {
         // &i32 同士での比較が可能（Ord トレイト）

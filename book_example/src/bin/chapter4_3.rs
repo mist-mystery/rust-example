@@ -47,9 +47,11 @@ fn main() {
 
         // first_word_str 関数は文字列スライスの部分スライスでも全体スライスでも受け入れる。当然文字列スライスそのものでもOK
         let _word1 = first_word_str(&hello_world[..6]);
+        #[allow(clippy::redundant_slicing)]
         let _word2 = first_word_str(&hello_world[..]);
         let _word3 = first_word_str(hello_world);
-        let _word4 = first_word_str(&hello_world); // 本来なら引数の型が異なる(&&str)が、エラーにはならない
+        #[allow(clippy::needless_borrow)] // 本来なら引数の型が異なる(&&str)が、エラーにはならない
+        let _word4 = first_word_str(&hello_world);
     }
     {
         // 文字列スライス以外のスライス
@@ -94,7 +96,7 @@ fn first_word_str(s: &str) -> &str {
             return &s[0..i];
         }
     }
-    &s[..]
+    s
 }
 
 fn return_slice(a: &[i32]) -> &[i32] {

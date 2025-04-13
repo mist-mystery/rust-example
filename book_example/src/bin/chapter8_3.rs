@@ -16,10 +16,10 @@ fn new_hashmap() {
     scores1.insert(String::from("Blue"), 10);
     scores1.insert(String::from("Yellow"), 50);
 
-    // タプルの Vec から iter().zip(...).collect() を利用して HashMap を作成。
+    // iter().zip(...).collect() を利用して HashMap を作成。
     // こちらは key, value ともに不変参照となる（数値であろうとコピーが起きず、HashMap に所有権がない）。
-    let teams = vec![String::from("Blue"), String::from("Yellow")];
-    let initial_scores = vec![10, 50];
+    let teams = [String::from("Blue"), String::from("Yellow")];
+    let initial_scores = [10, 50];
     let scores2: HashMap<_, _> = teams.iter().zip(initial_scores.iter()).collect();
 
     // get メソッドで取得するのは不変参照の Option 型

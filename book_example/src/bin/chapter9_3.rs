@@ -28,7 +28,7 @@ pub struct Guess {
 // こうすることで、確実に Guess インスタンスの value は 1～100までという保証をしている。
 impl Guess {
     pub fn new(value: u32) -> Self {
-        if value < 1 || value > 100 {
+        if !(1..=100).contains(&value) {
             panic!("Guess value must be between 1 and 100, got {value}.");
         }
 

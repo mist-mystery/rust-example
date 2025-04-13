@@ -66,6 +66,7 @@ mod lifetime_struct {
         part: &'a str,
     }
 
+    #[allow(clippy::needless_lifetimes)] // このケースでは impl ImportantExcerpt<'_> とした方が簡潔。
     // 構造体フィールド用のライフタイム名は impl キーワードの後に宣言する。
     impl<'a> ImportantExcerpt<'a> {
         // &self が引数にあるため、出力ライフタイム引数は self のライフタイムと同じになる。

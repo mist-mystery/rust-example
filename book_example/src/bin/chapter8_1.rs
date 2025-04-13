@@ -3,6 +3,7 @@ fn main() {
         // 空のベクタを作成。何も挿入しないなら、どんなデータを保持させるかの型注釈が必須。
         let _v: Vec<i32> = Vec::new();
     }
+    #[allow(clippy::vec_init_then_push)]
     {
         // 可変にして push メソッドで値を追加
         let mut v = Vec::new();
@@ -10,6 +11,7 @@ fn main() {
         v.push(6);
     }
     {
+        #[allow(clippy::useless_vec)] // 説明用のため Vec を使用
         // vec! マクロで初期値を持つ新しいベクタを作成。中身があれば型は推論される。
         let v = vec![1, 2, 3, 4, 5];
 

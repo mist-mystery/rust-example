@@ -20,7 +20,7 @@ fn slice() {
     {
         // as_mut_slice : &mut [..] を使うのと同じ
         let mut buffer1 = vec![1, 2, 3, 4, 5];
-        let mut buffer2 = vec![1, 2, 3, 4, 5];
+        let mut buffer2 = [1, 2, 3, 4, 5];
         let mut buffer3 = vec![1, 2, 3, 4, 5];
         let slice1 = buffer1.as_mut_slice();
         let slice2 = &mut buffer2[..];

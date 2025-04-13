@@ -54,7 +54,8 @@ fn main() {
     }
 }
 
-// sはStringへの参照
+#[allow(clippy::ptr_arg)] // ここでの引数は &str のほうが受け入れ範囲が広い
+// sはStringへの参照。
 fn calculate_length(s: &String) -> usize {
     s.len()
 } // ここで、sはスコープ外になる。けど、参照しているものの所有権を持っているわけではないので何も起こらない
@@ -82,5 +83,6 @@ fn change_return_ref(s: &mut String) -> &String {
 // String を直接返すとムーブされ、メモリは解放されない
 fn no_dungle() -> String {
     let s = String::from("no_dungle");
+    #[allow(clippy::let_and_return)]
     s
 }

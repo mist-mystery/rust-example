@@ -42,6 +42,7 @@ impl Rectangle {
 }
 
 fn main() {
+    #[allow(clippy::needless_borrow)]
     {
         let rect = Rectangle {
             width: 30,

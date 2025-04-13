@@ -13,7 +13,9 @@ mod tests {
     #[should_panic = "index out of bounds: the len is 3 but the index is 99"]
     // Vec に対する無効な添え字アクセスで buffer overread は起こらず panic する。
     fn vec_panic() {
+        #[allow(clippy::useless_vec)] // 説明用のため Vec を使用
         let vec = vec![1, 2, 3];
+        #[allow(clippy::unnecessary_operation)] // テストのためにわざと範囲外アクセスを起こす
         vec[99];
     }
 
@@ -23,6 +25,6 @@ mod tests {
     fn slice_panic() {
         let a = [1, 2, 3];
         let slice = &a[..];
-        slice[99];
+        let _ = slice[99];
     }
 }

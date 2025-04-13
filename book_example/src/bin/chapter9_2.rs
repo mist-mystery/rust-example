@@ -38,10 +38,7 @@ fn read_username_from_file() -> Result<String, io::Error> {
     // cargo run で実行するならカレントディレクトリはプロジェクトルートとなる。
     let username_file_result = File::open("src/public/username.txt");
 
-    let mut username_file = match username_file_result {
-        Ok(file) => file,
-        Err(e) => return Err(e),
-    };
+    let mut username_file = username_file_result?;
 
     let mut username = String::new();
 

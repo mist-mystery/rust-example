@@ -31,15 +31,14 @@ fn return_from_loops() -> i32 {
     // counter をループの外に保持し、条件を満たしたら `break` でループを抜け、値を返す
     let mut counter = 0;
 
-    let result = loop {
+    loop {
         counter += 1;
         if counter == 10 {
             break counter * 2;
             // result を使用せず条件を満たしたときに関数から値を返すようにしても実質同じこと
             // return counter * 2;
         }
-    };
-    result
+    }
 }
 
 fn loop_label() {

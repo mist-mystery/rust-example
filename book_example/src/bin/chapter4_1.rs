@@ -60,6 +60,7 @@ fn makes_copy(some_integer: i32) {
 // gives_ownershipは、戻り値を呼び出した関数にムーブする
 fn gives_ownership() -> String {
     let some_string = String::from("hello");
+    #[allow(clippy::let_and_return)]
     some_string // some_stringが返され、呼び出し元関数にムーブされる
 }
 
