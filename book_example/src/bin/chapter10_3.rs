@@ -124,10 +124,12 @@ mod lifetime_difference {
     }
 
     impl<'a> Reader<'a> {
+        #[allow(clippy::ptr_arg)]
         fn read1_book(&mut self, _content: &String) -> &str {
             self.book
         }
 
+        #[allow(clippy::ptr_arg)]
         fn read2_book(&'a mut self, _content: &String) -> &'a str {
             self.book
         }
@@ -138,6 +140,7 @@ mod lifetime_difference {
         }
 
         // &self と戻り値 &str のライフタイムは同じになる。
+        #[allow(dead_code)]
         fn read4_content<'b>(&'b self, content: &'b String) -> &'b str {
             content
         }

@@ -269,6 +269,7 @@ mod capture {
 
     fn once() {
         let x = vec![1, 2, 3];
+        // move キーワードを使用することで x をムーブすることを強制
         let equal_to_x = move || x;
         // assert_eq!(x, vec![1, 2, 3]); // x はムーブされたためこれはできない。
 
