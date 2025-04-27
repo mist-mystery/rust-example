@@ -16,7 +16,7 @@ members = [
   "chapter13_3",
   "chapter14_2",
   "chapter14_3/add_one",
-  "chapter14_3/adder",
+  "chapter14_3/adder", "chapter15_1",
   "chapter1_1",
   "chapter2",
   "chapter3_2",
