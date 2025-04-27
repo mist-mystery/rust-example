@@ -1,7 +1,42 @@
-[package]
-name = "book_example"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-rand = "0.9.0"
+[workspace]
+resolver = "2"
+members = [
+  "chapter10_0",
+  "chapter10_1",
+  "chapter10_2",
+  "chapter10_3",
+  "chapter11",
+  "chapter12_1",
+  "chapter12_2",
+  "chapter12_3",
+  "chapter12_4",
+  "chapter12_5",
+  "chapter13_1",
+  "chapter13_2",
+  "chapter13_3",
+  "chapter14_2",
+  "chapter14_3/add_one",
+  "chapter14_3/adder",
+  "chapter1_1",
+  "chapter2",
+  "chapter3_2",
+  "chapter3_3",
+  "chapter3_5",
+  "chapter4_1",
+  "chapter4_2",
+  "chapter4_3",
+  "chapter5_1",
+  "chapter5_2",
+  "chapter5_3",
+  "chapter6_1",
+  "chapter6_2",
+  "chapter6_3",
+  "chapter7",
+  "chapter8_1",
+  "chapter8_2",
+  "chapter8_3",
+  "chapter9_1",
+  "chapter9_2",
+  "chapter9_3",
+  "stdlib",
+]
