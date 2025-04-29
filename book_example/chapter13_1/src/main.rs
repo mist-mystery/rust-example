@@ -106,6 +106,32 @@ mod expensive {
 mod lazy {
     use std::{thread, time::Duration};
 
+    // クロージャと Option の結果値を保持する構造体
+    struct Cacher<T: Fn(u32) -> u32> {
+        calculation: T,
+        value: Option<u32>,
+    }
+
+    impl<T: Fn(u32) -> u32> Cacher<T> {
+        // 引数は value を取得するためのクロージャ。
+        // 最初は値がないので value フィールドは None になる。
+        fn new(calculation: T) -> Self {
+            Self {
+                calculation,
+                value: None,
+            }
+        }
+
+        // value フィールドに値があればそれを返し、なければクロージャを実行して値を value フィールドに保持し、それを返す。
+        fn value(&mut self, arg: u32) -> u32 {
+            self.value.unwrap_or_else(|| {
+                let v = (self.calculation)(arg);
+                self.value = Some(v);
+                v
+            })
+        }
+    }
+
     // メモ化（あるいは遅延評価）によるリファクタ。
     // 高価な計算は最大1回だけで、必要なければ全く行われなくなる。
     pub fn generate_workout(intensity: u32, random_number: u32) {
@@ -130,36 +156,44 @@ mod lazy {
             );
         }
     }
-
-    // クロージャと Option の結果値を保持する構造体
-    struct Cacher<T: Fn(u32) -> u32> {
-        calculation: T,
-        value: Option<u32>,
-    }
-
-    impl<T: Fn(u32) -> u32> Cacher<T> {
-        // 引数は value を取得するためのクロージャ。
-        // 最初は値がないので value フィールドは None になる。
-        fn new(calculation: T) -> Cacher<T> {
-            Self {
-                calculation,
-                value: None,
-            }
-        }
-
-        // value フィールドに値があればそれを返し、なければクロージャを実行して値を value フィールドに保持し、それを返す。
-        fn value(&mut self, arg: u32) -> u32 {
-            self.value.unwrap_or_else(|| {
-                let v = (self.calculation)(arg);
-                self.value = Some(v);
-                v
-            })
-        }
-    }
 }
 
 mod general {
     use std::{collections::HashMap, hash::Hash};
+
+    // lazy::Cacher を一般化。
+    // calculation は1引数の任意のクロージャ、stores は calculation の引数を key、戻り値を value とする HashMap.
+    // クロージャの引数や HashMap のキーとする K は、所有権を奪ったり Clone をしないように、参照型にする。
+    // V はクロージャによって生成された値で、クロージャからはムーブされて HashMap が所有権を持つ。
+    struct Cacher<'a, F, K, V>
+    where
+        F: Fn(&K) -> V,
+        K: Eq + Hash,
+    {
+        calculation: F,
+        stores: HashMap<&'a K, V>,
+    }
+
+    impl<'a, F, K, V> Cacher<'a, F, K, V>
+    where
+        F: Fn(&K) -> V,
+        K: Eq + Hash,
+    {
+        fn new(calculation: F) -> Self {
+            Self {
+                calculation,
+                stores: HashMap::new(),
+            }
+        }
+
+        fn value(&mut self, arg: &'a K) -> &V {
+            if !self.stores.contains_key(arg) {
+                let v = (self.calculation)(arg);
+                self.stores.insert(arg, v);
+            }
+            self.stores.get(arg).unwrap()
+        }
+    }
 
     pub fn int_cache() {
         // キーの値を2倍した値が戻り値となり、それを HashMap に保持する関数。
@@ -207,44 +241,10 @@ mod general {
         assert_eq!(cacher.value(&"go"), &2);
         println!("Q3 end");
     }
-
-    // lazy::Cacher を一般化。
-    // calculation は1引数の任意のクロージャ、stores は calculation の引数を key、戻り値を value とする HashMap.
-    // クロージャの引数や HashMap のキーとする K は、所有権を奪ったり Clone をしないように、参照型にする。
-    // V はクロージャによって生成された値で、クロージャからはムーブされて HashMap が所有権を持つ。
-    struct Cacher<'a, F, K, V>
-    where
-        F: Fn(&K) -> V,
-        K: Eq + Hash,
-    {
-        calculation: F,
-        stores: HashMap<&'a K, V>,
-    }
-
-    impl<'a, F, K, V> Cacher<'a, F, K, V>
-    where
-        F: Fn(&K) -> V,
-        K: Eq + Hash,
-    {
-        fn new(calculation: F) -> Cacher<'a, F, K, V> {
-            Self {
-                calculation,
-                stores: HashMap::new(),
-            }
-        }
-
-        fn value(&mut self, arg: &'a K) -> &V {
-            if !self.stores.contains_key(arg) {
-                let v = (self.calculation)(arg);
-                self.stores.insert(arg, v);
-            }
-            self.stores.get(arg).unwrap()
-        }
-    }
 }
 
 mod capture {
-    pub fn main() {
+    pub fn run() {
         immutable();
         mutable();
         once();
@@ -278,6 +278,40 @@ mod capture {
     }
 }
 
+// https://doc.rust-lang.org/nomicon/subtyping.html
+// https://doc.rust-lang.org/nomicon/phantom-data.html
+mod phantom {
+    use std::marker::PhantomData;
+
+    /// 構造体フィールドで型引数Tを使っていないとコンパイルエラーになる。
+    /// これは、型引数がフィールドにないと変性(variance)が定まらず、型安全性が保証できなくなるためらしい。
+    /// それを避けるために PhantomData と呼ばれる特殊な型を用いて、強制的に T を消費する。
+    /// なお、PhantomData<T> とすると、T を所有しているとみなされる。特に所有を明示する必要がないのであれば PhantomData<fn() -> T> のほうがいいらしい。
+    struct Wrap<F, T>
+    where
+        F: Fn(T),
+    {
+        callback: F,
+        _marker: PhantomData<fn() -> T>,
+    }
+
+    pub fn run() {
+        let w1 = Wrap {
+            callback: |s| println!("{s}"),
+            _marker: PhantomData,
+        };
+        let w2 = Wrap {
+            callback: |s| println!("{s}"),
+            _marker: PhantomData,
+        };
+
+        let local = "local";
+
+        (w1.callback)(local);
+        (w2.callback)(String::from(local));
+    }
+}
+
 fn main() {
     closure::main();
 
@@ -300,5 +334,6 @@ fn main() {
         _ => eprintln!("Invalid argument."),
     }
 
-    capture::main();
+    capture::run();
+    phantom::run();
 }

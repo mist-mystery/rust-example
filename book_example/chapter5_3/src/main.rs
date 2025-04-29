@@ -22,7 +22,7 @@ impl Rectangle {
         self.width > other.width && self.height > other.height
     }
 
-    // Associated Functions
+    // Associated Functions (関連関数)
     // 最初のパラメータに self を持たない（ゆえにメソッドではない）。
     // コンストラクタとして使う場合は `new` が使われることが多いが、new は特別な名前ではない。
     fn square(size: u32) -> Self {
@@ -53,6 +53,10 @@ fn main() {
         // メソッドのシグニチャに一致するようにコンパイラが自動で `&`, `&mut`, `*` のいずれかを付与する。
         assert_eq!(rect.area(), 1500);
         assert_eq!((&rect).area(), 1500); // つけても問題ない
+
+        // 冗長だが、メソッド記法を使わず関連関数で書いても問題はない。
+        // この場合、自動参照及び参照外しは行われない。
+        assert_eq!(Rectangle::area(&rect), 1500);
     }
     {
         let mut rect_m = Rectangle {
