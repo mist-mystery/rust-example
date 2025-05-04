@@ -1,5 +1,6 @@
-//! Box （スマートポインタ）の使用方法。
-//! 参照と異なり、スマートポインタは指している値を所有する。
+//! Box はスマートポインタの一種で、ヒープに値を確保し、（参照と異なり）その値の所有権を持つ。
+//! 実態としては値のポインタをタプル構造体に保持している。
+//!
 //! - temporary lifetime extension
 
 /// Box<T> はヒープにデータを確保する。
@@ -7,15 +8,20 @@ fn box_use() {
     {
         let b1 = Box::new(5);
         println!("b = {b1}");
-        assert_eq!(
-            *b1, 5,
-            "Box は参照のようにデリファレンスできる（Derefトレイトを実装している）"
-        );
 
         // Box は Copy を実装しておらず、同じ中身を指す Box を複数作ることはできない。
-        let b2 = b1;
-        // assert_eq!(*b1, 5);
+        let b2 = b1; // ムーブ
+        // assert_eq!(*b1, 5); // borrow of moved value: `b1`
         assert_eq!(*b2, 5);
+
+        #[derive(Debug, PartialEq)]
+        struct MyStruct;
+        let b3 = Box::new(MyStruct);
+        // Box<T> は T が Copy を実装していない型の場合、デリファレンスによりムーブが発生するという特殊な挙動をする。
+        // https://doc.rust-lang.org/reference/expressions.html#r-expr.move.movable-place
+        let ref_b1 = *b3;
+        assert_eq!(ref_b1, MyStruct);
+        // assert_eq!(b3, Box::new(MyStruct)); // borrow of moved value: `b3`
     }
 
     {
