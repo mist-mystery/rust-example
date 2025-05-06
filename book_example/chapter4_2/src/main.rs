@@ -1,3 +1,7 @@
+//! keywords
+//! - several immutable references (&T): aliasing
+//! - one mutable reference (&mut T): mutability
+
 fn main() {
     {
         // （複数の）不変な参照

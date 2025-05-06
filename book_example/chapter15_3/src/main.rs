@@ -36,7 +36,7 @@ mod custom_smart_pointer {
         println!("CustomSmartPointer created.");
 
         // drop メソッドを呼び出すことは許されていない（cの破棄時に drop メソッドが呼ばれ、二重開放が起きてしまうため）
-        // c.drop();
+        // c.drop(); // explicit destructor calls not allowed
         drop(c); // std::med::drop 関数を呼び出すことで早期に強制的に drop させられる。
         // println!("{}", c.data); // drop(c) の後は c はムーブされるため使えなくなる。
 

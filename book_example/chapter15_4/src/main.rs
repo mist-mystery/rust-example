@@ -1,8 +1,6 @@
 //! Rc は参照カウント(Reference Count)ポインタ。
 //! 値をヒープに確保し、その所有権を共有できる。
 //! 内部的には値の実体及び強参照カウンタ、弱参照カウンタをヒープ上に確保している。
-//! keywords
-//! - Box の dereference による move
 
 /// Cons リストとイミュータブルスタックを参照を駆使して実装。
 /// 参照とライフタイムを使えば複数の変数で要素の共有はできるが、全要素が少なくともリストの寿命の間は生きなければならなくなる。
@@ -146,9 +144,7 @@ mod box_scope {
         assert!(!ptr::eq(&*bbox, &*cbox));
         assert!(!ptr::eq(bbox.deref(), cbox.deref()));
 
-        // Box はデリファレンスすると中身がムーブするという特殊な挙動をする。
-        // https://doc.rust-lang.org/reference/expressions.html#r-expr.move.movable-place
-        let listbox = *bbox;
+        let listbox = *bbox; // Box はデリファレンスすると中身がムーブするという特殊な挙動
         // ListBox<T> の T に Copy が実装されていないと、パターンマッチで head のムーブが起きるため、listbox はもう使えなくなる。
         let ListBox::Cons(head, tailbox) = listbox else {
             panic!()
@@ -219,8 +215,8 @@ mod box_scope {
 }
 
 /// Cons リストとイミュータブルスタックを Rc で実装。
-/// Rc を使うことで、単独の値に複数の所有者を持たせることができる。
-/// Rc::clone では参照先の値はコピーしない（他の言語のシャローコピーに近い）。
+/// Rc を使うメリットは、データの所有権を構造体自体に持たせつつ、その構造体を clone してもデータ参照先の clone はせずコストがかからない、という点にある。
+/// Rc::clone は他の言語のシャローコピーに近いといえる。
 mod rc_scope {
     use std::rc::Rc;
 
