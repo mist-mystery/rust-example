@@ -19,7 +19,7 @@ fn print_labeled_measurement(value: i32, unit_label: char) {
     println!("The measurement is: {value}{unit_label}");
 }
 
-// 最後の式を暗黙的に返す。返り値の型も明示しなければならない。
+// 最後の式を暗黙的に返す。戻り値の型も明示しなければならない。
 // セミコロンをつけると文になってしまうためつけない
 fn five() -> i32 {
     5

@@ -33,7 +33,7 @@ fn open_file() -> File {
 }
 
 // Result 型を返すことで、エラー時の処理を呼び出し元に任せる（エラーの委譲）。
-// 今回は、File::open も read_to_string も Err の中身が io::Error なので、返り値の失敗の型をそれにしている。
+// 今回は、File::open も read_to_string も Err の中身が io::Error なので、戻り値の失敗の型をそれにしている。
 fn read_username_from_file() -> Result<String, io::Error> {
     // cargo run で実行するならカレントディレクトリはプロジェクトルートとなる。
     let username_file_result = File::open("username.txt");
@@ -49,9 +49,9 @@ fn read_username_from_file() -> Result<String, io::Error> {
 }
 
 // ?演算子を使って上の関数を簡潔に。
-// Result の値が Err であれば関数の返り値がその Err となって早期 return される。
+// Result の値が Err であれば関数の戻り値がその Err となって早期 return される。
 // 関数末尾で Ok の値を返す。
-// ?演算子を使うには、返り値が Result 型である、全てのエラー型が一つのエラー型で表現できる（または From トレイトを実装している）必要がある。
+// ?演算子を使うには、戻り値が Result 型である、全てのエラー型が一つのエラー型で表現できる（または From トレイトを実装している）必要がある。
 fn read_username_from_file_try() -> Result<String, io::Error> {
     let mut username = String::new();
     // ?の後にメソッド呼び出しを連結できる。

@@ -1,7 +1,7 @@
 //! [Rust Doc](https://doc.rust-lang.org/std/ops/trait.Deref.html) には "Used for immutable dereferencing operations, like `*v.`" とある。
 //! 他の std::ops と同様に、基本的には * 演算子使用時に自動で呼ばれるものなので、defer メソッドを明示的に呼び出すのはあまり行わない。
 //! 独自型に Deref を実装すると、Deref Coercion によりコンパイラが暗黙的に deref メソッドを何度も呼ぶことがあるため注意が必要。
-//! Rc や Box では `&*`, deref, as_ref は結果は同じになるが、使い分けを意識した方が良いと言える。
+//! Rc や Box では `&*`, as_ref は結果は同じになるが、使い分けを意識した方が良いと言える。
 
 mod rc {
     use std::{ops::Deref, rc::Rc};

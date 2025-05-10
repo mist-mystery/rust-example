@@ -131,7 +131,7 @@ fn describe_state_quarter(coin: &Coin) -> Option<String> {
 
 // 早期 return
 fn describe_state_quarter_early(coin: &Coin) -> Option<String> {
-    // if let でパターンにマッチした値 state を返り値として、ローカル変数 coin_state に束縛する。
+    // if let でパターンにマッチした値 state を戻り値として、ローカル変数 coin_state に束縛する。
     let coin_state = if let Coin::Quarter(state) = coin {
         state
     } else {

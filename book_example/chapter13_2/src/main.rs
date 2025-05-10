@@ -104,7 +104,7 @@ fn iterator_closure() {
     // shoes はムーブされる。
     fn shoes_in_my_size(shoes: Vec<Shoe>, shoe_size: u32) -> Vec<Shoe> {
         // shoes の所有権を奪ってイテレータを作成。
-        // shoe_size をキャプチャし、size が shoe_size と等しいもののみ残す。型は返り値の型となる。
+        // shoe_size をキャプチャし、size が shoe_size と等しいもののみ残す。型は戻り値の型となる。
         shoes.into_iter().filter(|s| s.size == shoe_size).collect()
     }
 
