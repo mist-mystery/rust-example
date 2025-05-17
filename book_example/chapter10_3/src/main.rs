@@ -10,6 +10,7 @@
 //!   dangling reference 回避が目的。
 //!   ライフタイム引数により、関数の引数と戻り値のライフタイムの接続に関する情報を提供する。
 //! - lifetime elision
+//! - non-lexical lifetime (NLL)
 //!
 //! # Reference
 //! - https://doc.rust-lang.org/nomicon/lifetimes.html
@@ -372,6 +373,31 @@ mod lifetime_difference {
     }
 }
 
+// Drop を実装していると、スコープを抜ける際に構造体が借用されたままであると、
+// 可変借用するメソッドの drop が呼べなくてコンパイルエラーになる。
+mod lifetime_drop {
+    #[derive(Debug)]
+    #[allow(dead_code)]
+    struct X<'a>(&'a i32);
+
+    impl Drop for X<'_> {
+        fn drop(&mut self) {
+            println!("droppped: {:?}", self);
+        }
+    }
+
+    pub fn run() {
+        let mut data = vec![1, 2, 3];
+        data.push(4);
+        let x = X(&data[0]); // data の不変借用（x が drop するまで継続）
+        println!("{x:?}");
+
+        // x はスコープを抜けたときに可変借用メソッドの drop が呼ばれる。
+        // data の不変借用が続いているままであるため、ここで data の可変借用メソッドは呼べない。
+        // data.push(5);
+    }
+}
+
 fn main() {
     lifetime::run();
     lifetime_book_struct::run();
@@ -379,4 +405,5 @@ fn main() {
     gen_trait_lifetime::run();
 
     lifetime_difference::run();
+    lifetime_drop::run();
 }
