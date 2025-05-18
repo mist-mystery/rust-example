@@ -1,8 +1,15 @@
+//! - Rust has only one string type in the core language,
+//!   which is the string slice `str` that is usually seen in its borrowed form `&str`.
+//! - The `String` type, which is provided by Rust’s standard library rather than coded into the core language,
+//!   is a growable, mutable, owned, UTF-8 encoded string type.
+//! - `String` is actually implemented as a wrapper around a vector of bytes
+//!   with some extra guarantees, restrictions, and capabilities.
+
 fn main() {}
 #[cfg(test)]
 mod tests {
     #[test]
-    // String は非常によく使われるため、たくさんの選択肢がある
+    /// String は非常によく使われるため、たくさんの選択肢がある
     fn new_string() {
         let s1 = "initial contents".to_string();
         let s2 = String::from("initial contents");
@@ -27,7 +34,7 @@ mod tests {
     }
 
     #[test]
-    // 複数の文字列を連結しようとすると複雑になる。
+    /// 複数の文字列を連結しようとすると複雑になる。
     fn string_concat_complex() {
         let s1 = String::from("tic");
         let s2 = String::from("tac");
@@ -41,19 +48,21 @@ mod tests {
     #[test]
     #[should_panic(expected = "byte index 1 is not a char boundary")]
     fn char_boundary() {
-        let hello = "Здравствуйте";
-        let _hello = String::from(hello);
+        let str_hello = "Здравствуйте";
+        #[allow(unused_variables)]
+        let string_hello = String::from(str_hello);
         // 文字列に添え字記法でのアクセスはできない（Index トレイトは実装されていない）。
-        // let h = hello[0];
-        // let h = _hello[0];
+        // let h = str_hello[0];
+        // let h = string_hello[0];
 
         // 文字列スライスを作ることはできるが、char boundary でないところで区切ろうとすると panic
-        assert_eq!(&hello[0..4], "Зд");
-        let _s = &hello[0..1];
+        assert_eq!(&str_hello[0..4], "Зд");
+        let _s = &str_hello[0..1];
     }
 
     #[test]
-    // 文字列の要素アクセスには chars メソッド、bytes メソッドを使えばエラーは起きない。
+    /// 文字列の要素アクセスには chars メソッド、bytes メソッドを使えばエラーは起きない。
+    /// なお、標準ライブラリでは書記素クラスタを扱う方法は提供されていない。
     fn string_methods() {
         let hello = "नमस्ते";
         for c in hello.chars() {
