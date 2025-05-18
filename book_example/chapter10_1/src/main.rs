@@ -1,6 +1,6 @@
 mod point1 {
     // 型引数を1つだけ使用。
-    // なお、ジェネリックな型はコンパイル時に単相化され、コード中で使用している Point<i32> と Point<f64> が生成される。
+    // なお、ジェネリックな型はコンパイル時に単相化(Monomorphization)され、コード中で使用している Point<i32> と Point<f64> が生成される。
     // メリットはコンパイル時に静的ディスパッチを行うことで実行時コストがかからないため速度が早くなる。
     // デメリットはバイナリサイズが肥大化する。
     struct Point<T> {
@@ -69,8 +69,8 @@ mod point2 {
     }
 
     // 構造体定義のジェネリックな型引数が、メソッドシグニチャで使う型引数とは一致していなくてもいい。
-    impl<T, U> Point<T, U> {
-        fn mixup<V, W>(self, other: Point<V, W>) -> Point<T, W> {
+    impl<X1, Y1> Point<X1, Y1> {
+        fn mixup<X2, Y2>(self, other: Point<X2, Y2>) -> Point<X1, Y2> {
             Point {
                 x: self.x,
                 y: other.y,
