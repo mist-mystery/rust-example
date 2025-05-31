@@ -428,6 +428,7 @@ mod return_trait {
     }
 }
 
+// トレイト境界で PartialOrd を使用
 mod trait_ord {
     fn use_largest() {
         // トレイト境界に PartialOrd を含めて、大なり演算子(>)や小なり演算子(<)での比較をできるようにする。
@@ -467,8 +468,8 @@ mod trait_ord {
         assert_eq!(*result, 'y');
     }
 
+    // トレイト境界を使ってメソッド実装を条件分け
     fn conditionally_implement() {
-        // トレイト境界を使ってメソッド実装を条件分け
         struct Pair<T> {
             x: T,
             y: T,
@@ -493,10 +494,10 @@ mod trait_ord {
 
         // &Pair<i32> は PartialOrd を実装していないため、largest メソッドは実装されていない。
         let _mix_pair = Pair::new(&int_pair, &int_pair);
-        // assert_eq!(_mix_pair.largest(), &int_pair);
+        // assert_eq!(_mix_pair.largest(), &int_pair); // the method `largest` exists for struct `Pair<&Pair<{integer}>>`, but its trait bounds were not satisfied
     }
 
-    pub fn main() {
+    pub fn run() {
         use_largest();
         conditionally_implement();
     }
@@ -513,6 +514,7 @@ mod blanket_implementation {
     }
 
     // トレイト境界を満たすあらゆる型にトレイトを実装することを blanket implementation という。
+    // 標準ライブラリで広く使用されている。
     // HelloTrait は Clone を実装している型全てに対して実装され、say_hello メソッドを呼べるようになる。
     impl<T: Clone> HelloTrait for T {
         fn say_hello(&self) -> &str {
@@ -534,7 +536,7 @@ mod blanket_implementation {
         }
     }
 
-    pub fn main() {
+    pub fn run() {
         // プリミティブ型をレシーバとして say_hello メソッドを呼べる。
         assert_eq!(1.say_hello(), "Hello from a Clone-able type!");
 
@@ -552,6 +554,6 @@ fn main() {
     default_implementation::run();
     trait_boundary::run();
     return_trait::run();
-    trait_ord::main();
-    blanket_implementation::main();
+    trait_ord::run();
+    blanket_implementation::run();
 }
