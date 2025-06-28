@@ -1,7 +1,12 @@
-//! ライフタイムとは、参照が有効でなければならない領域(region)のことである。
-//! 参照を保持する変数のライフタイムが長引くと、借用期間も長くなる（ことが多く、借用規則に違反しがちである）ため、
+//! Rust におけるライフタイムとは、以下の2つの意味で使われている。
+//!   - 参照が**使用される**期間（別の言い方をすると、参照が有効でなければならない領域(region)）に対応する「参照のライフタイム」
+//!   - 値が**解放される**まで（別の言い方をすると、値のデストラクタが呼ばれるまで）の期間に対応する「値のライフタイム」
+//!
+//! 2つを区別するため、「値のライフタイム」を「**スコープ**」と呼ぶ。
+//!
+//! 参照のライフタイムが長引くと、借用期間も長くなる（ことが多く、借用規則に違反しがちである）ため、
 //! コンパイラはできるだけこのライフタイムを最小限にしようとする。
-//! ほとんどの場合暗黙的に推論されるが、関数の境界をまたぐ場合など、明示的に指定が必要になる場合もある。
+//! 多くの場合暗黙的に推論されるが、関数の境界をまたぐ場合など、明示的に指定が必要になる場合もある。
 //!
 //! - ライフタイムパラメータはジェネリクスの一種であり、参照が有効であることを示すためのものである。コンパイル後にこの情報は消える。
 //! - ライフタイムにより dangling reference の発生を回避できる。
@@ -17,19 +22,21 @@ mod lifetime {
     use std::cmp::min;
 
     #[rustfmt::skip]
-    // 変数のライフタイムを明示。なお、let は暗黙的にスコープを導入する。
-    // r は 'a で、x は 'b で注釈されている。ライフタイムが切れるのは 'b → 'a の順番となる。
-    // println! で r のライフタイム 'a と、r が参照している値のライフタイム 'b の長さを比較する。
-    // その結果、'b の方が 'a より短いため、コンパイルエラーとなる。
+    // r と x のライフタイムを 'outer, 'inner で明示的に示す。
+    // ライフタイムが切れるのは 'inner → 'outer の順番となる。
+    // println! で r を使っているため、'outer は println! の位置まで生き続けなければならない。
+    // しかし、ブロック内で r に代入しようとしている &x のライフタイムは 'inner で、
+    // これはスコープがブロック終了で途切れることから、'inner が有効なのもブロック内に限られる。
+    // ゆえに、'inner のリージョンである &x を 'outer のリージョンが必要な r に代入することはできない。
     fn simple()    {
-        let r;          // ─────────┬─ 'a
-        {                     //          │
-            let x = 5;   // ─┬── 'b  │
-            r = &x;           //  │       │
-            assert_eq!(r, &5);//  │       │
-        }                     // ─┘       │
-        // println!("r: {r}");//          │
-                              // ─────────┘
+        let r: &i32;          // ─────────────┬─ 'outer
+        {                     //              │
+            let x: i32 = 5;   // ─┬── 'inner  │
+            r = &x;           //  │           │
+            //  ^ &'inner i32 //  │           │
+            assert_eq!(r, &5);//  │           │
+        }                     // ─┘           │
+        // println!("r: {r}");// ─────────────┘
     }
 
     // 戻り値のライフタイム外で戻り値を使おう（参照やムーブ）とするとコンパイルエラー
@@ -43,7 +50,8 @@ mod lifetime {
             result = longest(string_literal, xyz_ref);
             assert_eq!(result, "abcd");
         }
-        // result の参照先のライフタイムはスコープ内に限られるが、その外で result を参照しようとしているため、コンパイルエラー。
+        // result に代入している参照のライフタイム（= xyz_ref のライフタイム）はスコープ内に限られるが、
+        // その外で result を参照しようとしているため、コンパイルエラーとなる。
         // assert_eq!(result, "abcd");
     }
 
@@ -128,7 +136,7 @@ mod lifetime {
         result.as_str()
     }
 
-    // ライフタイム省略規則を満たす場合は、ライフタイムを省略できる。
+    // ライフタイム省略規則(Lifetime Elision)を満たす場合は、ライフタイムを省略できる。
     // - 1引数関数は一つのライフタイム引数、2引数関数は二つのライフタイム引数、…を得る。
     // - 入力ライフタイム引数が一つだけであれば、そのライフタイムが全ての出力ライフタイム引数に代入される。
     // - メソッドであり入力ライフタイム引数の一つが &self や &mut self であれば、self のライフタイム引数が全ての出力ライフタイム引数に代入される。
@@ -264,7 +272,7 @@ mod lifetime_struct {
     }
 }
 
-// ジェネリックな型引数、トレイト境界を組み合わせる。特筆すべきこともないため the book の例そのまま。
+// ジェネリックな型引数、トレイト境界(impl Trait syntax)を組み合わせる。特筆すべきこともないため the book の例そのまま。
 mod gen_trait_lifetime {
     use std::fmt::Display;
 
@@ -278,6 +286,8 @@ mod gen_trait_lifetime {
         );
     }
 
+    // ライフタイムパラメータ 'a と型パラメータの T を並べて <> の中に記述。
+    // このシグネチャなら impl Trait syntax を使う方が簡単。
     fn longest_with_an_announcement<'a, T>(x: &'a str, y: &'a str, ann: T) -> &'a str
     where
         T: Display,
@@ -337,7 +347,6 @@ mod lifetime_difference {
     }
 
     #[allow(unused_mut)]
-    // read2 メソッドの戻り値 r は、引数で渡した値(value)の生存期間より長く生きれない。
     fn exec_read3() {
         // ここでは特に mutable にする意味はないが、exec_read4 と条件を同じにするために mutable にしている。
         let mut r;
@@ -359,7 +368,7 @@ mod lifetime_difference {
         let value = String::from("value");
         {
             let reader = Reader { book: "the book" };
-            // r = reader.read4_content(&value); // ここでライフタイムのエラーとなる。
+            // r = reader.read4_content(&value); // `reader` does not live long enough
         }
         assert_eq!(r, "value");
     }
@@ -388,12 +397,15 @@ mod lifetime_drop {
     pub fn run() {
         let mut data = vec![1, 2, 3];
         data.push(4);
-        let x = X(&data[0]); // data の不変借用（x が drop するまで継続）
-        println!("{x:?}");
-
-        // x はスコープを抜けたときに可変借用メソッドの drop が呼ばれる。
-        // data の不変借用が続いているままであるため、ここで data の可変借用メソッドは呼べない。
-        // data.push(5);
+        {
+            let x = X(&data[0]); // data の不変借用（x が drop するまで継続）
+            println!("{x:?}");
+            // x はスコープを抜けたときに可変借用メソッドの drop が呼ばれる。
+            // data の不変借用が続いているままであるため、ここで data の可変借用メソッドは呼べない。
+            // data.push(5); // cannot borrow `data` as mutable because it is also borrowed as immutable
+        }
+        // x のスコープを抜けたため、data の可変借用メソッドが呼べる。
+        data.push(6);
     }
 }
 

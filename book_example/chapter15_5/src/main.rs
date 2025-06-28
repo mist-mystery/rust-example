@@ -83,14 +83,14 @@ fn cell() {
         // ↓を有効にすると、cell_ref の不変参照が↑での可変参照取得より後まで残ってしまうため、借用規則に違反しエラーになる。
         // let cell2 = cell_ref.replace(Wrap(3));
 
-        // cannot borrow `cell` as mutable more than once at a time second mutable borrow occurs here
-        // assert_eq!(cell.get_mut(), &mut Wrap(2)); // cell_get_mut が生きているうちは、cell の可変借用は許可されない。
+        // cell_get_mut が生きているうちは、cell の可変借用は許可されない。
+        // assert_eq!(cell.get_mut(), &mut Wrap(2)); // cannot borrow `cell` as mutable more than once at a time
 
-        // cannot borrow `cell` as immutable because it is also borrowed as mutable immutable borrow occurs here
-        // cell.set(Wrap(3)); // cell の不変参照を引数に取るメソッドも許可されない。
+        // cell の不変参照を引数に取るメソッドも許可されない。
+        // cell.set(Wrap(3)); // cannot borrow `cell` as immutable because it is also borrowed as mutable
 
-        // cannot move out of `cell` because it is borrowed move out of `cell` occurs here
-        // assert_eq!(cell.into_inner(), Wrap(2)); // cell のムーブも許可されない。
+        // cell のムーブも許可されない。
+        // assert_eq!(cell.into_inner(), Wrap(2)); // cannot move out of `cell` because it is borrowed
 
         *cell_get_mut = Wrap(3); // 可変参照経由で cell の中身を変更
         let _ = cell_get_mut; // 可変参照を drop
@@ -249,7 +249,7 @@ mod tracker {
 // 2. 構造体の要素を共有して複数箇所で使用する。
 // 3. 構造体の要素を可変にする。
 //
-// 満たしたいのが1と2だけなら Rc<T>, 1と3だけなら Box<T>, 2と3だけなら &mut T など他の手段もとれるが、
+// 満たしたいのが1と2だけなら Rc<T>, 1と3だけなら Box<T> など他の手段もとれるが、
 // 全部満たしたいとなると Rc と RefCell (あるいは Cell) の組合せが必須となる。
 // なお、マルチスレッドの場合はまた事情が異なってくる（Arc + Mutex を利用）。
 mod rc_refcell {
