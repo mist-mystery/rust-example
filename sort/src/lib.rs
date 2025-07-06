@@ -15,242 +15,150 @@ pub fn make_random_vector(count: usize) -> Vec<i32> {
 
 /// 交換ソート
 pub mod exchange_sort {
-    use super::VerifySort;
-
     /// バブルソート (平均: O(n^2), 最悪: O(n^2))
     /// 最後の要素から順番に確定させていく。
     ///
     /// 1. 0番目と1番目を比較して、順序が逆なら交換する。
     /// 2. 1番目と2番目を比較して、順序が逆なら交換する。
-    /// 3. n-2番目とn-1番目の比較まで繰り返すと、n-1番目（最後）の要素が最大値となる。
+    /// 3. n-2番目とn-1番目の比較まで繰り返すと、n-1番目（最後）の要素が最大値となり確定。
     /// 4. 0..=n-2 番目の要素について、同様に隣接する要素を比較して順序が逆なら交換する。
     /// 5. これを繰り返して、全ての要素がソートされるまで続ける。
-    pub fn bubble(src: &mut [i32]) -> VerifySort {
-        let n = src.len();
-        let mut compare_count = 0;
-        let mut swap_count = 0;
+    pub fn bubble(arr: &mut [impl PartialOrd]) {
+        let n = arr.len();
 
         for i in 0..n {
             for j in 0..n - i - 1 {
                 // 隣接する要素を比較して、順序が逆なら交換
-                compare_count += 1;
-                if src[j] > src[j + 1] {
-                    src.swap(j, j + 1);
-                    swap_count += 1;
+                if arr[j] > arr[j + 1] {
+                    arr.swap(j, j + 1);
                 }
             }
-        }
-        VerifySort {
-            sorted: src,
-            compare_count,
-            swap_count,
         }
     }
 
     /// シェーカーソート (平均: O(n^2), 最悪: O(n^2))
-    pub fn shaker(src: &mut [i32]) -> VerifySort {
-        let n = src.len();
-        let mut compare_count = 0;
-        let mut swap_count = 0;
+    pub fn shaker(arr: &mut [impl PartialOrd]) {
+        let n = arr.len();
         let mut left = 0;
         let mut right = n - 1;
 
         while left < right {
             let mut swapped = false;
             for i in left..right {
-                compare_count += 1;
-                if src[i] > src[i + 1] {
-                    src.swap(i, i + 1);
-                    swap_count += 1;
+                if arr[i] > arr[i + 1] {
+                    arr.swap(i, i + 1);
                     swapped = true;
                 }
             }
             right -= 1;
 
             for i in (left..right).rev() {
-                compare_count += 1;
-                if src[i] > src[i + 1] {
-                    src.swap(i, i + 1);
-                    swap_count += 1;
+                if arr[i] > arr[i + 1] {
+                    arr.swap(i, i + 1);
                     swapped = true;
                 }
             }
             left += 1;
 
-            compare_count += 1;
             if !swapped {
                 break;
             }
         }
-
-        VerifySort {
-            sorted: src,
-            compare_count,
-            swap_count,
-        }
     }
 
     /// クイックソート (平均: O(n log n), 最悪: O(n^2))
-    /// pivot（基準値）を選び、pivotより小さい要素と大きい要素に分けて再帰的にソートすることで、pivot の位置を順番に確定させていく。
-    pub fn quick(src: &mut [i32]) -> VerifySort {
-        let n = src.len();
-        let mut compare_count = 0;
-        let mut swap_count = 0;
+    ///
+    /// 1. pivot（基準値）を適当（ここでは最後の要素）に選び、pivotより小さい要素群, pivot, pivotより大きい要素群の順になるように再配置する。
+    ///     - 先頭要素から順番に見ていき、pivot より大きい要素があれば、それより後に位置する pivot より小さい要素と交換する。
+    ///     - ここで pivot の最終位置が決まる。
+    /// 2. pivot より小さい要素群、pivot より大きい要素群に対して、再帰的にクイックソートを適用する。
+    pub fn quick(arr: &mut [impl PartialOrd]) {
+        if arr.len() <= 1 {
+            return;
+        }
 
-        fn quick_sort_helper(
-            arr: &mut [i32],
-            low: usize,
-            high: usize,
-            compare_count: &mut usize,
-            swap_count: &mut usize,
-        ) {
-            if low < high {
-                let pivot_index = partition(arr, low, high, compare_count, swap_count);
-                if pivot_index > 0 {
-                    quick_sort_helper(arr, low, pivot_index - 1, compare_count, swap_count);
-                }
-                quick_sort_helper(arr, pivot_index + 1, high, compare_count, swap_count);
+        let pivot_index = partition(arr);
+        let (left, right) = arr.split_at_mut(pivot_index);
+
+        quick(left);
+        quick(&mut right[1..]); // right[0] is the pivot, so we skip it
+    }
+
+    fn partition(arr: &mut [impl PartialOrd]) -> usize {
+        let len = arr.len();
+        let mut i = 0;
+
+        for j in 0..len - 1 {
+            // arr[len - 1] を pivot として、pivot より小さい要素を左側に集める
+            if arr[j] <= arr[len - 1] {
+                arr.swap(i, j);
+                i += 1;
             }
         }
-
-        fn partition(
-            arr: &mut [i32],
-            low: usize,
-            high: usize,
-            compare_count: &mut usize,
-            swap_count: &mut usize,
-        ) -> usize {
-            let pivot = arr[high];
-            let mut i = low as isize - 1;
-
-            for j in low..high {
-                *compare_count += 1;
-                if arr[j] <= pivot {
-                    i += 1;
-                    arr.swap(i as usize, j);
-                    *swap_count += 1;
-                }
-            }
-            arr.swap((i + 1) as usize, high);
-            *swap_count += 1;
-            (i + 1) as usize
-        }
-
-        quick_sort_helper(src, 0, n - 1, &mut compare_count, &mut swap_count);
-
-        VerifySort {
-            sorted: src,
-            compare_count,
-            swap_count,
-        }
+        arr.swap(i, len - 1);
+        i
     }
 }
 
 /// 選択ソート
 pub mod selection_sort {
-    use super::VerifySort;
-
     /// 選択ソート (平均: O(n^2), 最悪: O(n^2))
     /// 0番目から順番に確定させていく。
     ///
     /// 1. 0..=n-1 番目の要素について最小値を見つけ、0番目の要素と交換する。
     /// 2. 1..=n-1 番目の要素について最小値を見つけ、1番目の要素と交換する。
     /// 3. これを繰り返す。
-    pub fn selection(src: &mut [i32]) -> VerifySort {
-        let n = src.len();
-        let mut compare_count = 0;
-        let mut swap_count = 0;
-
-        for i in 0..n {
-            let mut min_index = i;
-            for j in i + 1..n {
-                compare_count += 1;
-                if src[j] < src[min_index] {
-                    min_index = j;
-                }
+    pub fn selection(arr: &mut [impl Ord]) {
+        for i in 0..arr.len() {
+            if let Some((min_index, _)) =
+                arr[i..].iter().enumerate().min_by_key(|&(_, value)| value)
+            {
+                arr.swap(i, i + min_index);
             }
-            if min_index != i {
-                src.swap(i, min_index);
-                swap_count += 1;
-            }
-        }
-
-        VerifySort {
-            sorted: src,
-            compare_count,
-            swap_count,
         }
     }
 
-    pub fn heap(src: &mut [i32]) -> VerifySort {
-        let n = src.len();
-        let mut compare_count = 0;
-        let mut swap_count = 0;
+    /// ヒープソート (平均: O(n log n), 最悪: O(n log n))
+    pub fn heap(arr: &mut [impl PartialOrd]) {
+        let len = arr.len();
 
-        // Heapify subtree rooted at index i
-        fn heapify(
-            arr: &mut [i32],
-            n: usize,
-            i: usize,
-            compare_count: &mut usize,
-            swap_count: &mut usize,
-        ) {
-            let mut largest = i;
-            let l = 2 * i + 1;
-            let r = 2 * i + 2;
-
-            // println!(
-            //     "{arr:?} (largest, l, r): ({largest}, {l}, {r}) ({}, {}, {})",
-            //     arr[largest],
-            //     if l < n { arr[l] } else { -1 },
-            //     if r < n { arr[r] } else { -1 }
-            // );
-
-            if l < n {
-                *compare_count += 1;
-                if arr[l] > arr[largest] {
-                    largest = l;
-                }
-            }
-            if r < n {
-                *compare_count += 1;
-                if arr[r] > arr[largest] {
-                    largest = r;
-                }
-            }
-            if largest != i {
-                arr.swap(i, largest);
-                *swap_count += 1;
-                heapify(arr, n, largest, compare_count, swap_count);
-            }
+        // Build a max heap
+        for i in (0..len / 2).rev() {
+            sift_down(arr, i, len);
         }
-
-        // Build max heap
-        for i in (0..n / 2).rev() {
-            heapify(src, n, i, &mut compare_count, &mut swap_count);
-        }
-
-        // println!("{src:?}: Heap built");
 
         // Extract elements from heap one by one
-        for i in (1..n).rev() {
-            src.swap(0, i);
-            swap_count += 1;
-            heapify(src, i, 0, &mut compare_count, &mut swap_count);
+        for end in (1..len).rev() {
+            arr.swap(0, end);
+            sift_down(arr, 0, end);
         }
+    }
 
-        VerifySort {
-            sorted: src,
-            compare_count,
-            swap_count,
+    /// ヒープの再構築
+    fn sift_down(arr: &mut [impl PartialOrd], mut root: usize, end: usize) {
+        loop {
+            let left = 2 * root + 1;
+            let right = 2 * root + 2;
+            let mut largest = root;
+
+            if left < end && arr[left] > arr[largest] {
+                largest = left;
+            }
+            if right < end && arr[right] > arr[largest] {
+                largest = right;
+            }
+            if largest == root {
+                break;
+            }
+
+            arr.swap(root, largest);
+            root = largest;
         }
     }
 }
 
 /// 挿入ソート
 pub mod insertion_sort {
-    use super::VerifySort;
-
     /// 挿入ソート (平均: O(n^2), 最悪: O(n^2))
     /// 0番目から基準までの要素がソート済みになる。基準を1番目から順番にしていく。
     ///
@@ -261,31 +169,18 @@ pub mod insertion_sort {
     ///     3. 基準の要素を0番目に代入し、2番目基準終了。
     /// 3. 3番目の要素を基準にする。
     /// 4. これを繰り返して、全ての要素がソートされるまで続ける。
-    pub fn insertion(src: &mut [i32]) -> VerifySort {
+    pub fn insertion(src: &mut [impl PartialOrd + Copy]) {
         let n = src.len();
-        let mut compare_count = 0;
-        let mut swap_count = 0;
 
         for i in 1..n {
             let key = src[i];
             let mut j = i as isize - 1;
 
             while j >= 0 && src[j as usize] > key {
-                compare_count += 1;
                 src[(j + 1) as usize] = src[j as usize];
                 j -= 1;
-                swap_count += 1;
             }
             src[(j + 1) as usize] = key;
-            if j >= 0 {
-                compare_count += 1;
-            }
-        }
-
-        VerifySort {
-            sorted: src,
-            compare_count,
-            swap_count,
         }
     }
 }
@@ -361,51 +256,43 @@ mod tests {
     #[test]
     fn test_bubble_sort() {
         let mut v = make_random_vector(1000);
-        let sort = exchange_sort::bubble(&mut v);
-        assert_eq!(sort.sorted.len(), 1000);
-        assert!(sort.sorted.windows(2).all(|w| w[0] <= w[1]));
-        assert_eq!(sort.compare_count, 499500);
+        exchange_sort::bubble(&mut v);
+        assert!(v.windows(2).all(|w| w[0] <= w[1]));
     }
 
     #[test]
     fn test_shaker_sort() {
         let mut v = make_random_vector(1000);
-        let sort = exchange_sort::shaker(&mut v);
-        assert_eq!(sort.sorted.len(), 1000);
-        assert!(sort.sorted.windows(2).all(|w| w[0] <= w[1]));
+        exchange_sort::shaker(&mut v);
+        assert!(v.windows(2).all(|w| w[0] <= w[1]));
     }
 
     #[test]
     fn test_quick_sort() {
         let mut v = make_random_vector(1000);
-        let sort = exchange_sort::quick(&mut v);
-        assert_eq!(sort.sorted.len(), 1000);
-        assert!(sort.sorted.windows(2).all(|w| w[0] <= w[1]));
+        exchange_sort::quick(&mut v);
+        assert!(v.windows(2).all(|w| w[0] <= w[1]));
     }
 
     #[test]
     fn test_selection_sort() {
         let mut v = make_random_vector(1000);
-        let sort = selection_sort::selection(&mut v);
-        assert_eq!(sort.sorted.len(), 1000);
-        assert!(sort.sorted.windows(2).all(|w| w[0] <= w[1]));
-        assert_eq!(sort.compare_count, 499500);
+        selection_sort::selection(&mut v);
+        assert!(v.windows(2).all(|w| w[0] <= w[1]));
     }
 
     #[test]
     fn test_heap_sort() {
         let mut v = make_random_vector(1000);
-        let sort = selection_sort::heap(&mut v);
-        assert_eq!(sort.sorted.len(), 1000);
-        assert!(sort.sorted.windows(2).all(|w| w[0] <= w[1]));
+        selection_sort::heap(&mut v);
+        assert!(v.windows(2).all(|w| w[0] <= w[1]));
     }
 
     #[test]
     fn test_insertion_sort() {
         let mut v = make_random_vector(1000);
-        let sort = insertion_sort::insertion(&mut v);
-        assert_eq!(sort.sorted.len(), 1000);
-        assert!(sort.sorted.windows(2).all(|w| w[0] <= w[1]));
+        insertion_sort::insertion(&mut v);
+        assert!(v.windows(2).all(|w| w[0] <= w[1]));
     }
 
     #[test]
