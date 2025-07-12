@@ -34,20 +34,34 @@ mod tests {
     fn test_correlation_coefficient_empty() {
         let data: Vec<(f64, f64)> = vec![];
         let result = correlation_coefficient(&data);
-        assert_eq!(result, 0.0);
+        assert_eq!(result, 0.0, "Empty data should return 0.0");
     }
 
     #[test]
     fn test_correlation_coefficient_single_point() {
         let data = vec![(1.0, 2.0)];
         let result = correlation_coefficient(&data);
-        assert_eq!(result, 0.0); // Single point should return 0.0
+        assert_eq!(result, 0.0, "Single point should return 0.0");
     }
 
     #[test]
-    fn test_correlation_coefficient_zero_variance() {
-        let data = vec![(1.0, 2.0), (1.0, 3.0), (1.0, 4.0)];
+    fn test_correlation_coefficient_x_zero_variance() {
+        let data = vec![(1.0, 2.0), (1.0, 3.0), (1.0, 4.0)]; // x = 1.0
         let result = correlation_coefficient(&data);
-        assert_eq!(result, 0.0); // Zero variance in x should return 0.0
+        assert_eq!(result, 0.0, "Zero variance in x should return 0.0");
+    }
+
+    #[test]
+    fn test_correlation_coefficient_y_zero_variance() {
+        let data = vec![(1.0, 2.0), (2.0, 2.0), (3.0, 2.0)]; // y = 2.0
+        let result = correlation_coefficient(&data);
+        assert_eq!(result, 0.0, "Zero variance in y should return 0.0");
+    }
+
+    #[test]
+    fn test_correlation_coefficient_perfect_correlation() {
+        let data = vec![(1.0, 2.0), (2.0, 4.0), (3.0, 6.0)]; // Perfect correlation
+        let result = correlation_coefficient(&data);
+        assert_eq!(result, 1.0, "Perfect positive correlation");
     }
 }

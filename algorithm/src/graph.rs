@@ -27,3 +27,20 @@ pub fn dijkstra(
 
     dist
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dijkstra() {
+        let graph = vec![
+            vec![(1, 1), (2, 4)],
+            vec![(0, 1), (2, 2), (3, 5)],
+            vec![(0, 4), (1, 2), (3, 1)],
+            vec![(1, 5), (2, 1)],
+        ];
+        let dist = dijkstra(&graph, 0);
+        assert_eq!(dist, vec![0, 1, 3, 4]);
+    }
+}
