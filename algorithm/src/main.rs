@@ -1,8 +1,12 @@
 use std::time;
 
-use algorithm::sort::{self, exchange_sort, insertion_sort, merge_sort, selection_sort};
+use algorithm::{
+    indefinite_equation,
+    sort::{self, exchange_sort, insertion_sort, merge_sort, selection_sort},
+};
 
 fn main() {
+    solve_indefinite_equation(278_790, 5);
     exec_sort();
 }
 
@@ -57,4 +61,34 @@ fn faster_sort() {
         sorted_merge.swap_count,
         now.elapsed()
     );
+}
+
+fn solve_indefinite_equation(target: usize, factor_count: usize) {
+    let coeffs = [669, 596, 485, 403, 361];
+    let solutions = indefinite_equation::solve_asc(&coeffs, target);
+    let factor_counts = indefinite_equation::sieve_of_eratosthenes(target / coeffs[4]);
+
+    let mut solution_variances = solutions
+        .into_iter()
+        .map(|solves| {
+            let mean = solves.iter().map(|x| *x as f64).sum::<f64>() / solves.len() as f64;
+            let variance = solves
+                .iter()
+                .map(|x| (*x as f64 - mean).powi(2))
+                .sum::<f64>()
+                / solves.len() as f64;
+
+            (solves, variance)
+        })
+        // 全ての解の因数が4つ以上ある解のみを抽出
+        .filter(|(solves, _)| solves.iter().all(|&c| factor_counts[c] >= factor_count))
+        .collect::<Vec<_>>();
+
+    solution_variances.sort_by_key(|(_, variance)| *variance as usize);
+    let filtered: Vec<Vec<_>> = solution_variances
+        .into_iter()
+        .map(|(solves, _)| solves)
+        .collect();
+
+    println!("{:?}", filtered);
 }
