@@ -4,7 +4,7 @@
 /// 方程式 `c_0 * x_0 + c_1 * x_1 + ... + c_n * x_n = target` の自然数解を深さ優先探索で求める。
 /// ただし、`c_i` は係数、`x_i` は変数であり、すべての `x_i` は自然数（1以上）
 pub fn solve(coeffs: &[usize], target: usize) -> Vec<Vec<usize>> {
-    let mut solutions = Vec::new();
+    let mut solutions = vec![];
     let mut current = Vec::with_capacity(coeffs.len());
 
     if !coeffs.is_empty() {
@@ -21,7 +21,7 @@ pub fn solve(coeffs: &[usize], target: usize) -> Vec<Vec<usize>> {
 /// ただし、`c_i` は係数、`x_i` は変数であり、すべての `x_i` は自然数（1以上）、かつ `x_i >= x_{i-1}` を満たす。
 /// 解が昇順でない場合を枝狩りするため、実行速度が速い。
 pub fn solve_asc(coeffs: &[usize], target: usize) -> Vec<Vec<usize>> {
-    let mut solutions = Vec::new();
+    let mut solutions = vec![];
     let mut current = Vec::with_capacity(coeffs.len());
 
     if !coeffs.is_empty() {
@@ -88,16 +88,24 @@ fn dfs(
     }
 }
 
-pub fn sieve_of_eratosthenes(limit: usize) -> Vec<usize> {
-    let mut factor_count = vec![0; limit + 1];
-    factor_count[1] = 0;
+/// 0 から引数で与える自然数 n までの素因数の個数（重複あり）をそれぞれ求め、Vec で返す。
+pub fn count_total_prime_factors(n: usize) -> Vec<usize> {
+    let mut factor_counts = vec![0; n + 1];
 
-    for i in 2..=limit.isqrt() {
-        for j in (i * i..=limit).step_by(i) {
-            factor_count[j] += 1;
+    for i in 2..=n {
+        if factor_counts[i] == 0 {
+            let mut j = i;
+            while j <= n {
+                let mut k = j;
+                while k % i == 0 {
+                    factor_counts[j] += 1;
+                    k /= i;
+                }
+                j += i;
+            }
         }
     }
-    factor_count
+    factor_counts
 }
 
 #[cfg(test)]
